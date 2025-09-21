@@ -2,9 +2,9 @@
 const checkLength = (text, maxLength) => text.length <= maxLength;
 
 // Примеры использования
-console.log(checkLength('проверяемая строка', 20)); // true
-console.log(checkLength('проверяемая строка', 18)); // true
-console.log(checkLength('проверяемая строка', 10)); // false
+checkLength('проверяемая строка', 20); // true
+checkLength('проверяемая строка', 18); // true
+checkLength('проверяемая строка', 10); // false
 
 
 //Функция для проверки, является ли строка палиндромом
@@ -13,6 +13,6 @@ const isPalindrome = (text) => {
   const reversedText = normalizedText.split('').reverse().join('');
   return normalizedText === reversedText;
 };
-console.log(isPalindrome('топот')); // true
-console.log(isPalindrome('ДовОд')); // true
-console.log(isPalindrome('Кекс'));  // false
+isPalindrome('топот'); // true
+isPalindrome('ДовОд'); // true
+isPalindrome('Кекс');  // false
