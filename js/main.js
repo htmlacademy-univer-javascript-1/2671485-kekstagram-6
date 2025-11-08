@@ -17,5 +17,3 @@ const createPerson = () => ({
 
 const picturesData = Array.from({ length: 25 }, createPerson);
 renderPhotos(picturesData);
-
-export { createPerson };
