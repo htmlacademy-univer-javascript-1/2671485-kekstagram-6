@@ -1,3 +1,5 @@
+import { isEscapeKey } from './util.js';
+
 const COMMENTS_STEP = 5;
 
 const bigPicture = document.querySelector('.big-picture');
@@ -96,7 +98,7 @@ const onCancelButtonClick = () => {
 };
 
 const onDocumentKeydown = (evt) => {
-  if (evt.key === 'Escape' && !bigPicture.classList.contains('hidden')) {
+  if (isEscapeKey && !bigPicture.classList.contains('hidden')) {
     evt.preventDefault();
     closeBigPicture();
   }
