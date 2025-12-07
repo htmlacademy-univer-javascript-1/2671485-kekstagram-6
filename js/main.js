@@ -2,6 +2,7 @@ import { generateUniqueIteger, getRandomArrayElement, getRandomInteger } from '.
 import { DESCRIPTIONS } from './data.js';
 import { createComm } from './comment-generator.js';
 import { renderPhotos } from './pictures.js';
+import './form.js';
 
 const generatePhotoId = generateUniqueIteger(1, 25);
 const generateUrl = generateUniqueIteger(1, 25);
