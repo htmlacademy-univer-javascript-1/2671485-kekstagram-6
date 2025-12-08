@@ -1,2 +1,3 @@
 webpack.config.js
 js/pristine.js
+vendor/nouislider.js

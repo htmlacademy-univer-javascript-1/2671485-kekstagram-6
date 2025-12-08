@@ -1,9 +1,16 @@
 import { isEscapeKey } from './util.js';
+import { initSlider, onEffectChange, resetEffects } from './effects.js';
 
 const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_SYMBOLS = 20;
 const MAX_COMMENT_LENGTH = 140;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
+
+// Константы для масштабирования
+const SCALE_STEP = 25;
+const SCALE_MIN = 25;
+const SCALE_MAX = 100;
+const SCALE_DEFAULT = 100;
 
 const form = document.querySelector('.img-upload__form');
 const fileInput = form.querySelector('#upload-file');
@@ -13,6 +20,18 @@ const hashtagInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
 const submitButton = form.querySelector('.img-upload__submit');
 const body = document.body;
+
+// Элементы для масштабирования
+const scaleControlSmaller = form.querySelector('.scale__control--smaller');
+const scaleControlBigger = form.querySelector('.scale__control--bigger');
+const scaleControlValue = form.querySelector('.scale__control--value');
+const imagePreview = form.querySelector('.img-upload__preview img');
+
+// Элементы для эффектов
+const effectsList = form.querySelector('.effects__list');
+const effectLevel = form.querySelector('.img-upload__effect-level');
+const effectLevelValue = form.querySelector('.effect-level__value');
+const effectLevelSlider = document.querySelector('.effect-level__slider');
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -26,6 +45,24 @@ const pristine = new Pristine(form, {
 let errorMessage = '';
 const error = () => errorMessage;
 
+const scaleImage = (value) => {
+  scaleControlValue.value = `${value}%`;
+  imagePreview.style.transform = `scale(${value / 100})`;
+};
+
+const onScaleSmallerClick = () => {
+  const currentValue = parseInt(scaleControlValue.value, 10);
+  const newValue = Math.max(currentValue - SCALE_STEP, SCALE_MIN);
+  scaleImage(newValue);
+};
+
+const onScaleBiggerClick = () => {
+  const currentValue = parseInt(scaleControlValue.value, 10);
+  const newValue = Math.min(currentValue + SCALE_STEP, SCALE_MAX);
+  scaleImage(newValue);
+};
+
+// Валидация хэштегов
 const hashtagsHandler = (value) => {
   errorMessage = '';
   const inputText = value.toLowerCase().trim();
@@ -115,12 +152,32 @@ const closeForm = () => {
 
   form.reset();
   pristine.reset();
-  blockSubmitButton();
+
+  scaleImage(SCALE_DEFAULT);
+  resetEffects(imagePreview);
+
+  const originalEffect = form.querySelector('#effect-none');
+  if (originalEffect) {
+    originalEffect.checked = true;
+  }
+
+  initSlider(effectLevelSlider, effectLevel, effectLevelValue, imagePreview);
+
+  unblockSubmitButton();
 };
 
 const openForm = () => {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
+  scaleImage(SCALE_DEFAULT);
+  resetEffects(imagePreview);
+
+  const originalEffect = form.querySelector('#effect-none');
+  if (originalEffect) {
+    originalEffect.checked = true;
+  }
+
+  initSlider(effectLevelSlider, effectLevel, effectLevelValue, imagePreview);
 
   window.escKeydownHandler = (evt) => {
     if (isEscapeKey(evt)) {
@@ -156,7 +213,7 @@ const onFormSubmit = (evt) => {
   blockSubmitButton();
 
   setTimeout(() => {
-    unblockSubmitButton();
+    closeForm();
   }, 2000);
 };
 
@@ -164,6 +221,11 @@ const stopEscPropagation = (evt) => {
   if (isEscapeKey(evt)) {
     evt.stopPropagation();
   }
+};
+
+const handleEffectChange = (evt) => {
+  onEffectChange(evt, imagePreview);
+  initSlider(effectLevelSlider, effectLevel, effectLevelValue, imagePreview);
 };
 
 const initForm = () => {
@@ -177,6 +239,11 @@ const initForm = () => {
 
   hashtagInput.addEventListener('keydown', stopEscPropagation);
   commentInput.addEventListener('keydown', stopEscPropagation);
+
+  scaleControlSmaller.addEventListener('click', onScaleSmallerClick);
+  scaleControlBigger.addEventListener('click', onScaleBiggerClick);
+
+  effectsList.addEventListener('change', handleEffectChange);
 
   blockSubmitButton();
 };
