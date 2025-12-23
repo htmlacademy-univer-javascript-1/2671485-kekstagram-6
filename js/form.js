@@ -1,5 +1,6 @@
 import { isEscapeKey } from './util.js';
 import { initSlider, onEffectChange, resetEffects } from './effects.js';
+import { sendData } from './api.js';
 
 const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_SYMBOLS = 20;
@@ -31,7 +32,7 @@ const imagePreview = form.querySelector('.img-upload__preview img');
 const effectsList = form.querySelector('.effects__list');
 const effectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = form.querySelector('.effect-level__value');
-const effectLevelSlider = document.querySelector('.effect-level__slider');
+const effectLevelSlider = form.querySelector('.effect-level__slider');
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -127,10 +128,12 @@ pristine.addValidator(
 
 const blockSubmitButton = () => {
   submitButton.disabled = true;
+  submitButton.textContent = 'Публикую...';
 };
 
 const unblockSubmitButton = () => {
   submitButton.disabled = false;
+  submitButton.textContent = 'Опубликовать';
 };
 
 const onHashtagInput = () => {
@@ -164,6 +167,8 @@ const closeForm = () => {
   initSlider(effectLevelSlider, effectLevel, effectLevelValue, imagePreview);
 
   unblockSubmitButton();
+
+  fileInput.value = '';
 };
 
 const openForm = () => {
@@ -196,11 +201,63 @@ const openForm = () => {
 };
 
 const onFileChange = () => {
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      imagePreview.src = reader.result;
+    });
+
+    reader.readAsDataURL(file);
+  }
+
   openForm();
 };
 
 const onCancelClick = () => {
   closeForm();
+};
+
+const successTemplate = document.querySelector('#success');
+const errorTemplate = document.querySelector('#error');
+
+const showMessage = (template) => {
+  const messageFragment = template.content.cloneNode(true);
+  const message = messageFragment.querySelector('.error, .success');
+  const button = message.querySelector('.error__button, .success__button');
+
+  function closeMessage() {
+    message.remove();
+    document.removeEventListener('keydown', onDocumentKeydown);
+    document.removeEventListener('click', onDocumentClick);
+  }
+
+  function onDocumentKeydown(evt) {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      closeMessage();
+    }
+  }
+
+  function onDocumentClick(evt) {
+    if (!evt.target.closest('.error__inner, .success__inner')) {
+      closeMessage();
+    }
+  }
+
+  button.addEventListener('click', (evt) => {
+    evt.stopPropagation();
+    closeMessage();
+    if (message.classList.contains('error')) {
+      fileInput.click();
+    }
+  });
+
+  document.addEventListener('keydown', onDocumentKeydown);
+  document.addEventListener('click', onDocumentClick);
+
+  document.body.appendChild(message);
 };
 
 const onFormSubmit = (evt) => {
@@ -210,13 +267,24 @@ const onFormSubmit = (evt) => {
     return;
   }
 
-  blockSubmitButton();
+  submitButton.disabled = true;
+  submitButton.textContent = 'Публикую...';
 
-  setTimeout(() => {
-    closeForm();
-  }, 2000);
+  const formData = new FormData(evt.target);
+
+  sendData(formData)
+    .then(() => {
+      closeForm();
+      showMessage(successTemplate);
+    })
+    .catch(() => {
+      overlay.classList.add('hidden');
+      body.classList.remove('modal-open');
+      showMessage(errorTemplate);
+      submitButton.disabled = false;
+      submitButton.textContent = 'Опубликовать';
+    });
 };
-
 const stopEscPropagation = (evt) => {
   if (isEscapeKey(evt)) {
     evt.stopPropagation();

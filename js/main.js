@@ -1,6 +1,10 @@
-import { generatePhotos } from './data-generator.js';
+import { getData } from './api.js';
 import { renderPhotos } from './pictures.js';
 import './form.js';
 
-const picturesData = generatePhotos();
-renderPhotos(picturesData);
+const init = async () => {
+  const picturesData = await getData();
+  renderPhotos(picturesData);
+};
+
+init();
