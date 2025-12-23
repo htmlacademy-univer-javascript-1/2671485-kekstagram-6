@@ -98,7 +98,7 @@ const onCancelButtonClick = () => {
 };
 
 const onDocumentKeydown = (evt) => {
-  if (isEscapeKey && !bigPicture.classList.contains('hidden')) {
+  if (isEscapeKey(evt) && !bigPicture.classList.contains('hidden')) {
     evt.preventDefault();
     closeBigPicture();
   }
