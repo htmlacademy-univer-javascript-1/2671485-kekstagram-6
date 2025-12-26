@@ -21,7 +21,7 @@ const createComment = (comment) => {
 
   const img = document.createElement('img');
   img.classList.add('social__picture');
-  img.src = comment.url;
+  img.src = comment.avatar;
   img.alt = comment.name;
   img.width = 35;
   img.height = 35;
