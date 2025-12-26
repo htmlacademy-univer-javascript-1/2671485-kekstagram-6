@@ -31,4 +31,3 @@ const NAMES = [
   'Павел', 'Виктория', 'Михаил', 'Юлия', 'Андрей'
 ];
 
-export {DESCRIPTIONS, MESSAGES, NAMES};
