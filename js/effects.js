@@ -109,4 +109,4 @@ const resetEffects = (imagePreview) => {
   imagePreview.classList.add('effects__preview--none');
 };
 
-export { initSlider, onEffectChange, resetEffects, currentEffect };
+export { initSlider, onEffectChange, resetEffects };

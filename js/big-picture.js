@@ -47,7 +47,7 @@ const renderComments = () => {
   socialComments.appendChild(fragment);
   commentsShown += commentsPortion.length;
 
-  commentCountElement.innerHTML = `${commentsShown} из <span class="comments-count">${currentComments.length}</span> комментариев`;
+  commentCountElement.textContent = `${commentsShown} из ${currentComments.length} комментариев`;
 
   if (commentsShown >= currentComments.length) {
     commentsLoader.classList.add('hidden');
@@ -73,6 +73,19 @@ const fillPictureData = (picture) => {
   socialCaption.textContent = description;
 };
 
+const closeBigPicture = () => {
+  toggleModal();
+  commentsLoader.removeEventListener('click', onCommentsLoaderClick);
+  document.removeEventListener('keydown', onDocumentKeydown);
+};
+
+function onDocumentKeydown(evt) {
+  if (isEscapeKey(evt) && !bigPicture.classList.contains('hidden')) {
+    evt.preventDefault();
+    closeBigPicture();
+  }
+}
+
 const openBigPicture = (picture) => {
   currentComments = picture.comments.slice();
   commentsShown = 0;
@@ -86,22 +99,11 @@ const openBigPicture = (picture) => {
   renderComments();
   toggleModal();
   commentsLoader.addEventListener('click', onCommentsLoaderClick);
-};
-
-const closeBigPicture = () => {
-  toggleModal();
-  commentsLoader.removeEventListener('click', onCommentsLoaderClick);
+  document.addEventListener('keydown', onDocumentKeydown);
 };
 
 const onCancelButtonClick = () => {
   closeBigPicture();
-};
-
-const onDocumentKeydown = (evt) => {
-  if (isEscapeKey(evt) && !bigPicture.classList.contains('hidden')) {
-    evt.preventDefault();
-    closeBigPicture();
-  }
 };
 
 cancelButton.addEventListener('click', onCancelButtonClick);
