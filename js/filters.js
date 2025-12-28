@@ -1,6 +1,5 @@
 import { debounce } from './util.js';
 
-// Константы
 const RANDOM_PHOTOS_COUNT = 10;
 const FilterType = {
   DEFAULT: 'default',
@@ -11,11 +10,9 @@ const FilterType = {
 let currentPhotos = [];
 let currentFilter = FilterType.DEFAULT;
 
-// DOM элементы
 const filtersElement = document.querySelector('.img-filters');
 const filterButtons = filtersElement.querySelectorAll('.img-filters__button');
 
-// Функции фильтрации
 const getDefaultPhotos = () => [...currentPhotos];
 
 const getRandomPhotos = () => {
@@ -33,7 +30,6 @@ const getRandomPhotos = () => {
 
 const getDiscussedPhotos = () => [...currentPhotos].sort((a, b) => b.comments.length - a.comments.length);
 
-// Получение отфильтрованных фото
 const getFilteredPhotos = () => {
   switch (currentFilter) {
     case FilterType.RANDOM:
@@ -46,34 +42,28 @@ const getFilteredPhotos = () => {
   }
 };
 
-// Обновление активной кнопки
 const updateActiveButton = (activeButtonId) => {
   filterButtons.forEach((button) => {
     button.classList.toggle('img-filters__button--active', button.id === activeButtonId);
   });
 };
 
-// Очистка фотографий
 const clearPhotos = () => {
   const picturesContainer = document.querySelector('.pictures');
   const pictures = picturesContainer.querySelectorAll('.picture');
   pictures.forEach((picture) => picture.remove());
 };
 
-// Инициализация фильтров
 const initFilters = (photos, renderFunction) => {
   currentPhotos = photos;
 
-  // Показываем фильтры
   filtersElement.classList.remove('img-filters--inactive');
 
-  // Создаем debounced версию рендеринга
   const debouncedRender = debounce((filteredPhotos) => {
     clearPhotos();
     renderFunction(filteredPhotos);
   }, 500);
 
-  // Обработчик клика
   const onFilterButtonClick = (evt) => {
     if (!evt.target.classList.contains('img-filters__button')) {
       return;
@@ -91,7 +81,6 @@ const initFilters = (photos, renderFunction) => {
     debouncedRender(getFilteredPhotos());
   };
 
-  // Добавляем обработчики
   filterButtons.forEach((button) => {
     button.addEventListener('click', onFilterButtonClick);
   });

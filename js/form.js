@@ -130,12 +130,10 @@ pristine.addValidator(
 
 const blockSubmitButton = () => {
   submitButton.disabled = true;
-  submitButton.textContent = 'Публикую...';
 };
 
 const unblockSubmitButton = () => {
   submitButton.disabled = false;
-  submitButton.textContent = 'Опубликовать';
 };
 
 const onHashtagInput = () => {
@@ -275,7 +273,6 @@ const onFormSubmit = (evt) => {
 
   submitButton.disabled = true;
   submitButton.textContent = 'Публикую...';
-
   const formData = new FormData(evt.target);
 
   sendData(formData)
