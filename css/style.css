@@ -1195,7 +1195,7 @@ main {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 100;
 
   background-color: rgba(0, 0, 0, 0.8);
 }
@@ -1306,6 +1306,20 @@ main {
           transform: translateX(-50%);
 }
 
+.img-upload__error {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  color: red;
+  font-size: 14px;
+  line-height: 14px;
+  text-transform: none;
+  display: none;
+}
+
+.img-upload__item--invalid .img-upload__error {
+  display: block;
+}
+
 .img-upload__message--loading::after {
   content: "";
   position: absolute;
@@ -1394,4 +1408,8 @@ main {
 
 .hidden {
   display: none;
+}
+
+.img-upload__field-wrapper {
+  position: relative;
 }
