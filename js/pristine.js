@@ -351,26 +351,36 @@
         };
 
         function _removeError(field) {
-            var errorElements = _getErrorElements(field);
-            var errorClassElement = errorElements[0],
-                errorTextElement = errorElements[1];
-            var input = field.input;
+            var errorElements = field.errorElements;
+            var errorClassElement, errorTextElement;
 
+            if (errorElements) {
+                errorClassElement = errorElements[0];
+                errorTextElement = errorElements[1];
+            } else {
+                errorClassElement = findAncestor(field.input, self.config.classTo);
+                var errorTextParent;
+                if (self.config.classTo === self.config.errorTextParent) {
+                    errorTextParent = errorClassElement;
+                } else {
+                    errorTextParent = errorClassElement ? errorClassElement.querySelector('.' + self.config.errorTextParent) : null;
+                }
+                if (errorTextParent) {
+                    errorTextElement = errorTextParent.querySelector('.' + PRISTINE_ERROR);
+                }
+            }
 
             if (errorClassElement) {
-                // IE > 9 doesn't support multiple class removal
                 errorClassElement.classList.remove(self.config.errorClass);
                 errorClassElement.classList.remove(self.config.successClass);
-                input.removeAttribute('aria-describedby');
-                input.removeAttribute('aria-invalid');
+                field.input.removeAttribute('aria-describedby');
+                field.input.removeAttribute('aria-invalid');
             }
             if (errorTextElement) {
-                errorTextElement.removeAttribute('id');
-                errorTextElement.removeAttribute('role');
-                errorTextElement.innerHTML = '';
-                errorTextElement.style.display = 'none';
+                errorTextElement.parentNode.removeChild(errorTextElement);
+                field.errorElements = null;
             }
-            return errorElements;
+            return [errorClassElement, errorTextElement];
         }
 
         function _showSuccess(field) {

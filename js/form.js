@@ -6,6 +6,7 @@ const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_SYMBOLS = 20;
 const MAX_COMMENT_LENGTH = 140;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 // Константы для масштабирования
 const SCALE_STEP = 25;
@@ -33,6 +34,7 @@ const effectsList = form.querySelector('.effects__list');
 const effectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = form.querySelector('.effect-level__value');
 const effectLevelSlider = form.querySelector('.effect-level__slider');
+const effectsPreviews = form.querySelectorAll('.effects__preview');
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -186,6 +188,9 @@ const openForm = () => {
 
   window.escKeydownHandler = (evt) => {
     if (isEscapeKey(evt)) {
+      if (document.querySelector('.error')) {
+        return;
+      }
       if (document.activeElement === hashtagInput || document.activeElement === commentInput) {
         evt.stopPropagation();
         return;
@@ -202,14 +207,15 @@ const openForm = () => {
 
 const onFileChange = () => {
   const file = fileInput.files[0];
-  if (file) {
-    const reader = new FileReader();
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
 
-    reader.addEventListener('load', () => {
-      imagePreview.src = reader.result;
+  if (matches) {
+    const url = URL.createObjectURL(file);
+    imagePreview.src = url;
+    effectsPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${url})`;
     });
-
-    reader.readAsDataURL(file);
   }
 
   openForm();
@@ -278,17 +284,10 @@ const onFormSubmit = (evt) => {
       showMessage(successTemplate);
     })
     .catch(() => {
-      overlay.classList.add('hidden');
-      body.classList.remove('modal-open');
       showMessage(errorTemplate);
       submitButton.disabled = false;
       submitButton.textContent = 'Опубликовать';
     });
-};
-const stopEscPropagation = (evt) => {
-  if (isEscapeKey(evt)) {
-    evt.stopPropagation();
-  }
 };
 
 const handleEffectChange = (evt) => {
@@ -304,9 +303,6 @@ const initForm = () => {
   hashtagInput.addEventListener('input', onHashtagInput);
 
   commentInput.addEventListener('input', onHashtagInput);
-
-  hashtagInput.addEventListener('keydown', stopEscPropagation);
-  commentInput.addEventListener('keydown', stopEscPropagation);
 
   scaleControlSmaller.addEventListener('click', onScaleSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleBiggerClick);

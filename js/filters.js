@@ -60,25 +60,6 @@ const clearPhotos = () => {
   pictures.forEach((picture) => picture.remove());
 };
 
-// Обработчик клика на фильтр
-const onFilterClick = (evt, renderFunction) => {
-  if (!evt.target.classList.contains('img-filters__button')) {
-    return;
-  }
-
-  const clickedFilter = evt.target.id.replace('filter-', '');
-
-  if (clickedFilter === currentFilter) {
-    return;
-  }
-
-  updateActiveButton(evt.target.id);
-  currentFilter = clickedFilter;
-
-  clearPhotos();
-  renderFunction(getFilteredPhotos());
-};
-
 // Инициализация фильтров
 const initFilters = (photos, renderFunction) => {
   currentPhotos = photos;
@@ -86,14 +67,33 @@ const initFilters = (photos, renderFunction) => {
   // Показываем фильтры
   filtersElement.classList.remove('img-filters--inactive');
 
-  // Создаем debounced версию обработчика
-  const debouncedFilterHandler = debounce((evt) => {
-    onFilterClick(evt, renderFunction);
+  // Создаем debounced версию рендеринга
+  const debouncedRender = debounce((filteredPhotos) => {
+    clearPhotos();
+    renderFunction(filteredPhotos);
   }, 500);
+
+  // Обработчик клика
+  const onFilterButtonClick = (evt) => {
+    if (!evt.target.classList.contains('img-filters__button')) {
+      return;
+    }
+
+    const clickedFilter = evt.target.id.replace('filter-', '');
+
+    if (clickedFilter === currentFilter) {
+      return;
+    }
+
+    updateActiveButton(evt.target.id);
+    currentFilter = clickedFilter;
+
+    debouncedRender(getFilteredPhotos());
+  };
 
   // Добавляем обработчики
   filterButtons.forEach((button) => {
-    button.addEventListener('click', debouncedFilterHandler);
+    button.addEventListener('click', onFilterButtonClick);
   });
 };
 
